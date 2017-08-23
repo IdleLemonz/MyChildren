@@ -12,7 +12,8 @@ public class SceneUpdate : MonoBehaviour {
     Dictionary<int, PrefabUID> m_currentIDs = new Dictionary<int, PrefabUID>();
     TileData[] m_tiles;
     Collider[] prefabColliders;
-    PrefabCache prefabCache;    
+    PrefabCache prefabCache;
+    GameObject replaceObject;
     public List<GameObject> toDelete = new List<GameObject>();
 
     public void Start()
@@ -28,36 +29,8 @@ public class SceneUpdate : MonoBehaviour {
     // parent the instance to the parent
     // reparent the children
 
-    public GameObject ReplaceObject(GameObject obj)
-    {
-        //// pass in the game object to replace    
-        //int numChildren = 0;
-        //List<GameObject> needsReparenting = new List<GameObject>();
-        //if (obj.transform.childCount > 0)
-        //{
-        //    numChildren = obj.transform.childCount;
-        //    for (int i = 0; i < numChildren; i++)
-        //    {
-        //        // Recurse to the next child down
-        //        GameObject childObject = ReplaceObject(obj.transform.GetChild(i).gameObject);
-        //        // Add children to reparent them later, after returning from recursive function                
-        //        needsReparenting.Add(childObject);
-
-        //        // Get the prefab that matches this objects ID
-        //        if (obj.GetComponent<PrefabUID>() != null)
-        //        {
-        //            childObject = SwapPrefabs(obj, needsReparenting);
-        //        }
-        //        return childObject;
-        //    }
-        //}
-        //else
-        //{
-        //    GameObject noChildObject = SwapPrefabs(obj, needsReparenting);
-        //    return noChildObject;
-        //}
-        //return null;
-
+    public void ReplaceObject(GameObject obj)
+    {     
         // pass in the game object to replace    
         int numChildren = 0;
         List<GameObject> needsReparenting = new List<GameObject>();
@@ -67,30 +40,27 @@ public class SceneUpdate : MonoBehaviour {
             for (int i = 0; i < numChildren; i++)
             {
                 // Recurse to the next child down
-                GameObject childObject = ReplaceObject(obj.transform.GetChild(i).gameObject);
+                ReplaceObject(obj.transform.GetChild(i).gameObject);
                 // Add children to reparent them later, after returning from recursive function                
-                needsReparenting.Add(childObject);
-
-                // Get the prefab that matches this objects ID
-                if (obj.GetComponent<PrefabUID>() != null)
-                {
-                    childObject = SwapPrefabs(obj, needsReparenting);
-                }
-                return childObject;
+                needsReparenting.Add(replaceObject);                           
+            }
+            // Get the prefab that matches this objects ID
+            if (obj.GetComponent<PrefabUID>() != null)
+            {
+                replaceObject = SwapPrefabs(obj, needsReparenting);
             }
         }
         else
         {
-            GameObject noChildObject = SwapPrefabs(obj, needsReparenting);
-            return noChildObject;
-        }
-        return null;
+            replaceObject = SwapPrefabs(obj, needsReparenting);            
+        }        
     }
 
-    public GameObject SwapPrefabs(GameObject obj, List<GameObject> toReparent)
+    public GameObject SwapPrefabs(GameObject obj, List<GameObject> toReparent = null)
     {
         PrefabUID childID = obj.GetComponent<PrefabUID>(); // Get this object's ID
-        GameObject masterPrefab = FindMatchingID(childID); // prefab to update the current Game Object with                    
+        GameObject masterPrefab = FindMatchingID(childID); // prefab to update the current Game Object with   
+        string oldName = masterPrefab.name;                 
         GameObject oldParent = obj.transform.parent.gameObject; // store the old parent and transform data
         Vector3 oldScale = obj.transform.localScale;
         Vector3 oldPosition = obj.transform.position;
@@ -105,12 +75,14 @@ public class SceneUpdate : MonoBehaviour {
             copyPrefab.transform.localScale = oldScale;
             copyPrefab.transform.eulerAngles = oldRotation;
             copyPrefab.transform.parent = oldParent.transform;
-
+            copyPrefab.name = oldName;
+           
             foreach (GameObject child in toReparent)
             {
                 child.transform.parent = copyPrefab.transform;
-            }
-            toDelete.Add(obj);
+            }               
+                     
+            toDelete.Add(obj); // add the old object to the list of objects to be deleted
             return copyPrefab;     
         }        
         return null;
@@ -132,24 +104,7 @@ public class SceneUpdate : MonoBehaviour {
     {
         toDelete.Clear();
         m_tiles = FindObjectsOfType<TileData>();
-        ReplaceObject(m_tiles[0].gameObject);
-
-        //TileData[] objectsToUpdate = FindObjectsOfType<TileData>(); // load the tiles from the resources filder   
-        //int numChildren = 0;
-
-        //foreach (TileData tile in objectsToUpdate)
-        //{
-        //    if (tile.transform.childCount > 0)
-        //    {
-        //        numChildren = tile.transform.childCount;
-        //        for (int i = 0; i < numChildren; i++)
-        //        {
-        //            ReplaceObject(tile.transform.GetChild(i).gameObject);
-        //        }
-        //    }
-        //}
-
-
+        ReplaceObject(m_tiles[0].gameObject);  
 
         foreach (GameObject obj in toDelete)
         {
