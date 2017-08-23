@@ -104,13 +104,19 @@ public class SceneUpdate : MonoBehaviour {
     {
         toDelete.Clear();
         m_tiles = FindObjectsOfType<TileData>();
-        ReplaceObject(m_tiles[0].gameObject);  
+        foreach(TileData tile in m_tiles)
+        {
+            ReplaceObject(tile.gameObject);
+        }
+        
+
+        PrefabUtility.ReplacePrefab(m_tiles[0].gameObject, PrefabUtility.GetPrefabParent(m_tiles[0].gameObject), ReplacePrefabOptions.ConnectToPrefab);
 
         foreach (GameObject obj in toDelete)
         {
             DestroyImmediate(obj);
-        }       
-        
+        }
+        toDelete.Clear();
     }   
 
     public void ClearPrefabs()
