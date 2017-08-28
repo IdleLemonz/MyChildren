@@ -22,7 +22,7 @@ public class PrefabUIDEditor : Editor
         // set default ID to -1
         // check if ID is -1, if it is, get all ID's that are set, then give it a new highest value
 
-        base.OnInspectorGUI();    
+        base.OnInspectorGUI();
 
         //if(UID.m_locked)
         //{
@@ -57,7 +57,7 @@ public class PrefabUIDEditor : Editor
         //}
 
         //EditorGUILayout.Space();
-        
+
         //UID.CheckForExistingID();
 
         //if (GUILayout.Button("Reset All ID's"))

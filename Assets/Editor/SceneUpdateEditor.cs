@@ -36,9 +36,9 @@ public class SceneUpdateEditor : Editor
             //updater.ReplaceColliders();
         }
 
-        if (GUILayout.Button("Clear Scene"))
-        {
-            updater.ClearPrefabs();
-        }
+        //if (GUILayout.Button("Clear Scene"))
+        //{
+        //    updater.ClearPrefabs();
+        //}
     }
 }

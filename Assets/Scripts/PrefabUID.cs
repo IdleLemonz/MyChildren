@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class PrefabUID : MonoBehaviour {    
-
+public class PrefabUID : MonoBehaviour
+{    
     List<PrefabUID> toUpdate = new List<PrefabUID>();
 
     PrefabUID[] m_existingIDs;
